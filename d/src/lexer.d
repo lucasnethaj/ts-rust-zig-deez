@@ -3,15 +3,11 @@ module lexer;
 import std.format;
 import std.stdio : writeln;
 import std.ascii : isAlpha, isDigit;
-
+import std.meta;
 import token;
 
 @safe:
 
-bool isLetter(const char ch) pure nothrow @nogc
-{
-    return isAlpha(ch) || ch == '_';
-}
 
 struct Lexer
 {
@@ -31,8 +27,35 @@ struct Lexer
         Token tok;
         skipWhiteSpace;
 
+        TokenCase:
         switch (ch) with (TokenType)
         {
+
+        static foreach(TOKEN_TYPE; 
+            AliasSeq!(
+                SEMICOLON,
+                LPAREN,
+                RPAREN,
+                COMMA,
+                PLUS,
+                LBRACE,
+                RBRACE,
+                LT,
+                GT,
+                ASTERISK,
+                MINUS,
+                SLASH, 
+            )
+        ) {
+            
+            static assert(TOKEN_TYPE.length is 1, "This token can only be one char");
+
+            case TOKEN_TYPE[0]:
+                tok = Token(TOKEN_TYPE, TOKEN_TYPE[0]);
+                break TokenCase; 
+            
+        }
+    
         case '=':
             if (peekChar == '=')
             {
@@ -45,42 +68,7 @@ struct Lexer
                 tok = Token(ASSIGN, ch);
             }
             break;
-        case ';':
-            tok = Token(SEMICOLON, ch);
-            break;
-        case '(':
-            tok = Token(LPAREN, ch);
-            break;
-        case ')':
-            tok = Token(RPAREN, ch);
-            break;
-        case ',':
-            tok = Token(COMMA, ch);
-            break;
-        case '+':
-            tok = Token(PLUS, ch);
-            break;
-        case '{':
-            tok = Token(LBRACE, ch);
-            break;
-        case '}':
-            tok = Token(RBRACE, ch);
-            break;
-        case '<':
-            tok = Token(LT, ch);
-            break;
-        case '>':
-            tok = Token(GT, ch);
-            break;
-        case '*':
-            tok = Token(ASTERISK, ch);
-            break;
-        case '-':
-            tok = Token(MINUS, ch);
-            break;
-        case '/':
-            tok = Token(SLASH, ch);
-            break;
+
         case '!':
             if (peekChar == '=')
             {
@@ -174,6 +162,15 @@ struct Lexer
     }
 }
 
+
+bool isLetter(const char ch) pure nothrow @nogc
+{
+    return isAlpha(ch) || ch == '_';
+}
+
+
+
+
 /// Monkey code test
 unittest
 {
@@ -251,3 +248,5 @@ if (5 < 10) {
     }
 
 }
+
+

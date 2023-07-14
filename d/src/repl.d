@@ -6,12 +6,14 @@ import lexer;
 
 enum PROMPT = ">> ";
 
+@safe:
+
 void start(File inFile, File outFile)
 {
     while (true)
     {
         outFile.write(PROMPT);
-        string line = inFile.readln();
+        string line = (() @trusted => inFile.readln())();
         if (line == null)
         {
             break;
