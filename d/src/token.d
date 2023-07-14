@@ -72,13 +72,7 @@ enum TokenType
 
 private alias TT = const(TokenType);
 
-// immutable TokenType[string] keywords = [
-//     "fn": TT.FUNCTION, "let": TT.LET, "true": TT.TRUE, "false": TT.FALSE,
-//     "if": TT.IF, "else": TT.ELSE, "return": TT.RETURN,
-// ];
-import std.typecons;
-
-immutable keywords = [
+static immutable keywords = [
     tuple("fn", TT.FUNCTION), 
     tuple("let", TT.LET), 
     tuple("true", TT.TRUE), 
@@ -88,7 +82,7 @@ immutable keywords = [
     tuple("return", TT.RETURN),
 ];
 
-const(TokenType) lookupIdent(string ident) 
+const(TokenType) lookupIdent(const(string) ident) 
 {
     auto lookup = keywords.find!(keyword => keyword[0] == ident);
 
