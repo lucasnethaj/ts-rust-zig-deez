@@ -3,24 +3,31 @@ import std.conv;
 import std.typecons;
 import std.traits;
 
-struct Token {
+@safe:
+
+struct Token
+{
     TokenType type;
     string literal;
 
-    this(TokenType type, string literal) {
+    this(TokenType type, string literal)
+    {
         this.type = type;
         this.literal = literal;
     }
-    this(TokenType type, char literal) {
+
+    this(TokenType type, char literal)
+    {
         this.type = type;
         this.literal = literal.to!string;
     }
 }
 
-enum TokenType {
+enum TokenType
+{
     ILLEGAL = "ILLEGAL",
     EOF = "EOF",
-    
+
     // Identifiers + literals
     IDENT = "IDENT", // add, foobar, x, y, ...
     INT = "INT", // 1343456
@@ -28,17 +35,17 @@ enum TokenType {
     // Operators
     ASSIGN = "=",
     PLUS = "+",
-	MINUS    = "-",
-	BANG     = "!",
-	ASTERISK = "*",
-	SLASH = "/",
+    MINUS = "-",
+    BANG = "!",
+    ASTERISK = "*",
+    SLASH = "/",
 
-	LT = "<",
-	GT = ">",
+    LT = "<",
+    GT = ">",
 
-	EQ     = "==",
-	NOT_EQ = "!=",
-    
+    EQ = "==",
+    NOT_EQ = "!=",
+
     COMMA = ",",
     SEMICOLON = ";",
 
@@ -50,27 +57,24 @@ enum TokenType {
     // Keywords
     FUNCTION = "FUNCTION",
     LET = "LET",
-	TRUE = "TRUE",
-	FALSE = "FALSE",
-	IF = "IF",
-	ELSE = "ELSE",
-	RETURN = "RETURN",
+    TRUE = "TRUE",
+    FALSE = "FALSE",
+    IF = "IF",
+    ELSE = "ELSE",
+    RETURN = "RETURN",
 }
+
 private alias TT = TokenType;
 
 enum TokenType[string] keywords = [
-    "fn": TT.FUNCTION,
-    "let": TT.LET,
-	"true": TT.TRUE,
-	"false": TT.FALSE,
-	"if": TT.IF,
-	"else": TT.ELSE,
-	"return": TT.RETURN,
+    "fn": TT.FUNCTION, "let": TT.LET, "true": TT.TRUE, "false": TT.FALSE,
+    "if": TT.IF, "else": TT.ELSE, "return": TT.RETURN,
 ];
 
-
-TokenType lookupIdent(string ident) {
-    if (ident in keywords) {
+TokenType lookupIdent(string ident)
+{
+    if (ident in keywords)
+    {
         return keywords[ident];
     }
     return TT.IDENT;

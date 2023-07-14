@@ -6,7 +6,9 @@ import std.ascii : isAlpha, isDigit;
 
 import token;
 
-bool isLetter(byte ch)
+@safe:
+
+bool isLetter(const char ch) pure nothrow @nogc
 {
     return isAlpha(ch) || ch == '_';
 }
@@ -14,9 +16,9 @@ bool isLetter(byte ch)
 struct Lexer
 {
     string input;
-    int position;
-    int readPosition;
-    byte ch;
+    size_t position;
+    size_t readPosition;
+    char ch;
 
     this(string input)
     {
