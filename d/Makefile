@@ -2,6 +2,8 @@
 # Static part, don't change these:
 ##
 
+
+
 help:
 	@cat Makefile | grep -E "^\w+$:"
 
@@ -15,6 +17,7 @@ docker-ready: docker-build
 
 DC:=dmd
 DFILES:=$(shell find src/ -name "*.d" -type f)
+DFLAGS+=-preview=dip1000
 
 fmt:
 	@echo "===> Formatting"

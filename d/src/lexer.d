@@ -29,15 +29,17 @@ struct Lexer
         Token tok;
         skipWhiteSpace;
 
-        switch (ch) 
-        with(TokenType)
+        switch (ch) with (TokenType)
         {
         case '=':
-            if (peekChar == '=') {
+            if (peekChar == '=')
+            {
                 const ch = this.ch;
                 readChar;
                 tok = Token(EQ, [ch, this.ch]);
-            } else {
+            }
+            else
+            {
                 tok = Token(ASSIGN, ch);
             }
             break;
@@ -78,11 +80,14 @@ struct Lexer
             tok = Token(SLASH, ch);
             break;
         case '!':
-            if (peekChar == '=') {
+            if (peekChar == '=')
+            {
                 const ch = this.ch;
                 readChar;
                 tok = Token(NOT_EQ, [ch, this.ch]);
-            } else {
+            }
+            else
+            {
                 tok = Token(BANG, ch);
             }
             break;
@@ -146,10 +151,14 @@ struct Lexer
         return input[beginPos .. position];
     }
 
-    byte peekChar() {
-        if (readPosition >= input.length) {
+    byte peekChar()
+    {
+        if (readPosition >= input.length)
+        {
             return 0;
-        } else {
+        }
+        else
+        {
             return input[readPosition];
         }
     }
@@ -162,7 +171,6 @@ struct Lexer
         }
     }
 }
-
 
 /// Monkey code test
 unittest
@@ -189,80 +197,43 @@ if (5 < 10) {
 10 != 9;`;
 
     Token[] tests = [
-		Token(TokenType.LET, "let"),
-		Token(TokenType.IDENT, "five"),
-		Token(TokenType.ASSIGN, "="),
-		Token(TokenType.INT, "5"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.LET, "let"),
-		Token(TokenType.IDENT, "ten"),
-		Token(TokenType.ASSIGN, "="),
-		Token(TokenType.INT, "10"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.LET, "let"),
-		Token(TokenType.IDENT, "add"),
-		Token(TokenType.ASSIGN, "="),
-		Token(TokenType.FUNCTION, "fn"),
-		Token(TokenType.LPAREN, "("),
-		Token(TokenType.IDENT, "x"),
-		Token(TokenType.COMMA, ","),
-		Token(TokenType.IDENT, "y"),
-		Token(TokenType.RPAREN, ")"),
-		Token(TokenType.LBRACE, "{"),
-		Token(TokenType.IDENT, "x"),
-		Token(TokenType.PLUS, "+"),
-		Token(TokenType.IDENT, "y"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.RBRACE, "}"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.LET, "let"),
-		Token(TokenType.IDENT, "result"),
-		Token(TokenType.ASSIGN, "="),
-		Token(TokenType.IDENT, "add"),
-		Token(TokenType.LPAREN, "("),
-		Token(TokenType.IDENT, "five"),
-		Token(TokenType.COMMA, ","),
-		Token(TokenType.IDENT, "ten"),
-		Token(TokenType.RPAREN, ")"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.BANG, "!"),
-		Token(TokenType.MINUS, "-"),
-		Token(TokenType.SLASH, "/"),
-		Token(TokenType.ASTERISK, "*"),
-		Token(TokenType.INT, "5"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.INT, "5"),
-		Token(TokenType.LT, "<"),
-		Token(TokenType.INT, "10"),
-		Token(TokenType.GT, ">"),
-		Token(TokenType.INT, "5"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.IF, "if"),
-		Token(TokenType.LPAREN, "("),
-		Token(TokenType.INT, "5"),
-		Token(TokenType.LT, "<"),
-		Token(TokenType.INT, "10"),
-		Token(TokenType.RPAREN, ")"),
-		Token(TokenType.LBRACE, "{"),
-		Token(TokenType.RETURN, "return"),
-		Token(TokenType.TRUE, "true"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.RBRACE, "}"),
-		Token(TokenType.ELSE, "else"),
-		Token(TokenType.LBRACE, "{"),
-		Token(TokenType.RETURN, "return"),
-		Token(TokenType.FALSE, "false"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.RBRACE, "}"),
-		Token(TokenType.INT, "10"),
-		Token(TokenType.EQ, "=="),
-		Token(TokenType.INT, "10"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.INT, "10"),
-		Token(TokenType.NOT_EQ, "!="),
-		Token(TokenType.INT, "9"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.EOF, ""),
+        Token(TokenType.LET, "let"), Token(TokenType.IDENT, "five"),
+        Token(TokenType.ASSIGN, "="), Token(TokenType.INT, "5"),
+        Token(TokenType.SEMICOLON, ";"), Token(TokenType.LET, "let"),
+        Token(TokenType.IDENT, "ten"), Token(TokenType.ASSIGN, "="),
+        Token(TokenType.INT, "10"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.LET, "let"), Token(TokenType.IDENT, "add"),
+        Token(TokenType.ASSIGN, "="), Token(TokenType.FUNCTION, "fn"),
+        Token(TokenType.LPAREN, "("), Token(TokenType.IDENT, "x"),
+        Token(TokenType.COMMA, ","), Token(TokenType.IDENT, "y"),
+        Token(TokenType.RPAREN, ")"), Token(TokenType.LBRACE, "{"),
+        Token(TokenType.IDENT, "x"), Token(TokenType.PLUS, "+"),
+        Token(TokenType.IDENT, "y"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.RBRACE, "}"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.LET, "let"), Token(TokenType.IDENT, "result"),
+        Token(TokenType.ASSIGN, "="), Token(TokenType.IDENT, "add"),
+        Token(TokenType.LPAREN, "("), Token(TokenType.IDENT, "five"),
+        Token(TokenType.COMMA, ","), Token(TokenType.IDENT, "ten"),
+        Token(TokenType.RPAREN, ")"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.BANG, "!"), Token(TokenType.MINUS, "-"),
+        Token(TokenType.SLASH, "/"), Token(TokenType.ASTERISK, "*"),
+        Token(TokenType.INT, "5"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.INT, "5"), Token(TokenType.LT, "<"),
+        Token(TokenType.INT, "10"), Token(TokenType.GT, ">"),
+        Token(TokenType.INT, "5"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.IF, "if"), Token(TokenType.LPAREN, "("),
+        Token(TokenType.INT, "5"), Token(TokenType.LT, "<"),
+        Token(TokenType.INT, "10"), Token(TokenType.RPAREN, ")"),
+        Token(TokenType.LBRACE, "{"), Token(TokenType.RETURN, "return"),
+        Token(TokenType.TRUE, "true"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.RBRACE, "}"), Token(TokenType.ELSE, "else"),
+        Token(TokenType.LBRACE, "{"), Token(TokenType.RETURN, "return"),
+        Token(TokenType.FALSE, "false"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.RBRACE, "}"), Token(TokenType.INT, "10"),
+        Token(TokenType.EQ, "=="), Token(TokenType.INT, "10"),
+        Token(TokenType.SEMICOLON, ";"), Token(TokenType.INT, "10"),
+        Token(TokenType.NOT_EQ, "!="), Token(TokenType.INT, "9"),
+        Token(TokenType.SEMICOLON, ";"), Token(TokenType.EOF, ""),
     ];
 
     Lexer l = Lexer(input);
@@ -272,12 +243,9 @@ if (5 < 10) {
         const tok = l.nextToken();
         debug writeln(format("%s : %s", tok, t));
 
-        assert(tok.type == t.type,
-            format("Wrong token type '%s' expected '%s'", tok.type, t.type)
-        );
+        assert(tok.type == t.type, format("Wrong token type '%s' expected '%s'", tok.type, t.type));
         assert(tok.literal == t.literal,
-            format("Wrong literal '%s' expected '%s'", tok.literal, t.literal)
-        );
+                format("Wrong literal '%s' expected '%s'", tok.literal, t.literal));
     }
 
 }
