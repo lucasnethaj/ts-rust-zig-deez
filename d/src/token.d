@@ -2,8 +2,14 @@ module token;
 import std.conv;
 import std.typecons;
 import std.traits;
+import std.range;
+import std.algorithm;
+
 
 @safe:
+@nogc:
+nothrow:
+pure:
 
 struct Token
 {
@@ -64,18 +70,31 @@ enum TokenType
     RETURN = "RETURN",
 }
 
-private alias TT = TokenType;
+private alias TT = const(TokenType);
 
-enum TokenType[string] keywords = [
-    "fn": TT.FUNCTION, "let": TT.LET, "true": TT.TRUE, "false": TT.FALSE,
-    "if": TT.IF, "else": TT.ELSE, "return": TT.RETURN,
+// immutable TokenType[string] keywords = [
+//     "fn": TT.FUNCTION, "let": TT.LET, "true": TT.TRUE, "false": TT.FALSE,
+//     "if": TT.IF, "else": TT.ELSE, "return": TT.RETURN,
+// ];
+import std.typecons;
+
+immutable keywords = [
+    tuple("fn", TT.FUNCTION), 
+    tuple("let", TT.LET), 
+    tuple("true", TT.TRUE), 
+    tuple("false", TT.FALSE),
+    tuple("if", TT.IF), 
+    tuple("else", TT.ELSE), 
+    tuple("return", TT.RETURN),
 ];
 
-TokenType lookupIdent(string ident)
+const(TokenType) lookupIdent(string ident) 
 {
-    if (ident in keywords)
+    auto lookup = keywords.find!(keyword => keyword[0] == ident);
+
+    if (lookup.empty) 
     {
-        return keywords[ident];
+        return TT.IDENT;
     }
-    return TT.IDENT;
+    return lookup.front[1];
 }
