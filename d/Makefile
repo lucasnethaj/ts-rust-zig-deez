@@ -35,3 +35,8 @@ test:
 build:
 	@echo "===> Building"
 	$(DC) $(DFLAGS) -lib -of=deez $(DFILES)
+
+prog:
+	@echo "===> Building progam"
+	$(DC) $(DFLAGS) $(DFILES) -of=deez
+	

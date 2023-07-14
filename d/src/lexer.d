@@ -15,13 +15,19 @@ struct Lexer
     size_t position;
     size_t readPosition;
     char ch;
+    Token current_token;
 
     this(string input)
     {
         this.input = input;
         readChar;
+        popFront;
     }
 
+
+    
+
+    
     Token nextToken()
     {
         Token tok;
@@ -31,8 +37,7 @@ struct Lexer
         switch (ch) with (TokenType)
         {
 
-        static foreach(TOKEN_TYPE; 
-            AliasSeq!(
+        static foreach(TOKEN_TYPE; AliasSeq!(
                 SEMICOLON,
                 LPAREN,
                 RPAREN,
@@ -47,13 +52,11 @@ struct Lexer
                 SLASH, 
             )
         ) {
-            
             static assert(TOKEN_TYPE.length is 1, "This token can only be one char");
 
             case TOKEN_TYPE[0]:
                 tok = Token(TOKEN_TYPE, TOKEN_TYPE[0]);
                 break TokenCase; 
-            
         }
     
         case '=':
@@ -107,6 +110,20 @@ struct Lexer
         return tok;
     }
 
+
+    bool empty() const pure {
+        return readPosition > input.length;
+    }
+    void popFront() {
+        current_token = nextToken;
+    }
+
+    const(Token) front() const pure {
+        return current_token;
+    }
+
+
+    
     void readChar()
     {
         if (readPosition >= input.length)
@@ -141,7 +158,7 @@ struct Lexer
         return input[beginPos .. position];
     }
 
-    byte peekChar()
+    char peekChar()
     {
         if (readPosition >= input.length)
         {
@@ -239,12 +256,13 @@ if (5 < 10) {
 
     foreach (t; tests)
     {
-        const tok = l.nextToken();
+        const tok = l.front();
         debug writeln(format("%s : %s", tok, t));
 
         assert(tok.type == t.type, format("Wrong token type '%s' expected '%s'", tok.type, t.type));
         assert(tok.literal == t.literal,
                 format("Wrong literal '%s' expected '%s'", tok.literal, t.literal));
+        l.popFront;
     }
 
 }
