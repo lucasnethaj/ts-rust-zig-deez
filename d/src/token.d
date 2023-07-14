@@ -16,16 +16,16 @@ struct Token
     TokenType type;
     string literal;
 
-    this(TokenType type, string literal)
+    this(TokenType type, string literal) pure
     {
         this.type = type;
         this.literal = literal;
     }
 
-    this(TokenType type, char literal)
+    this(TokenType type, char literal) pure
     {
         this.type = type;
-        this.literal = literal.to!string;
+        this.literal = [literal];
     }
 }
 

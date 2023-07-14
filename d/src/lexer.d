@@ -7,7 +7,8 @@ import std.meta;
 import token;
 
 @safe:
-
+@nogc:
+nothrow:
 
 struct Lexer
 {
@@ -17,18 +18,15 @@ struct Lexer
     char ch;
     Token current_token;
 
-    this(string input)
+    this(string input) pure
     {
         this.input = input;
         readChar;
         popFront;
     }
 
-
     
-
-    
-    Token nextToken()
+    const(Token) nextToken() pure
     {
         Token tok;
         skipWhiteSpace;
@@ -114,7 +112,7 @@ struct Lexer
     bool empty() const pure {
         return readPosition > input.length;
     }
-    void popFront() {
+    void popFront() pure {
         current_token = nextToken;
     }
 
@@ -124,7 +122,7 @@ struct Lexer
 
 
     
-    void readChar()
+    void readChar() pure
     {
         if (readPosition >= input.length)
         {
@@ -138,7 +136,7 @@ struct Lexer
         readPosition += 1;
     }
 
-    string readNumber()
+    string readNumber() pure
     {
         const beginPos = position;
         while (isDigit(ch))
@@ -148,7 +146,7 @@ struct Lexer
         return input[beginPos .. position];
     }
 
-    string readIdentifier()
+    string readIdentifier() pure
     {
         const beginPos = position;
         while (isLetter(ch))
@@ -158,7 +156,7 @@ struct Lexer
         return input[beginPos .. position];
     }
 
-    char peekChar()
+    char peekChar() const pure
     {
         if (readPosition >= input.length)
         {
@@ -170,7 +168,7 @@ struct Lexer
         }
     }
 
-    void skipWhiteSpace()
+    void skipWhiteSpace() pure
     {
         while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')
         {
