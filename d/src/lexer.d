@@ -7,9 +7,8 @@ import std.meta;
 import token;
 
 @safe:
-@nogc:
-nothrow:
 
+@nogc
 struct Lexer
 {
     string input;
@@ -18,7 +17,7 @@ struct Lexer
     char ch;
     Token current_token;
 
-    this(string input) pure
+    this(string input) nothrow pure
     {
         this.input = input;
         readChar;
@@ -26,7 +25,7 @@ struct Lexer
     }
 
     
-    const(Token) nextToken() pure
+    const(Token) nextToken() pure nothrow
     {
         Token tok;
         skipWhiteSpace;
@@ -112,17 +111,17 @@ struct Lexer
     bool empty() const pure {
         return readPosition > input.length;
     }
-    void popFront() pure {
+    void popFront() pure nothrow {
         current_token = nextToken;
     }
 
-    const(Token) front() const pure {
+    const(Token) front() const pure nothrow {
         return current_token;
     }
 
 
     
-    void readChar() pure
+    void readChar() pure nothrow
     {
         if (readPosition >= input.length)
         {
@@ -136,7 +135,7 @@ struct Lexer
         readPosition += 1;
     }
 
-    string readNumber() pure
+    string readNumber() pure nothrow
     {
         const beginPos = position;
         while (isDigit(ch))
@@ -146,7 +145,7 @@ struct Lexer
         return input[beginPos .. position];
     }
 
-    string readIdentifier() pure
+    string readIdentifier() pure nothrow
     {
         const beginPos = position;
         while (isLetter(ch))
@@ -156,7 +155,7 @@ struct Lexer
         return input[beginPos .. position];
     }
 
-    char peekChar() const pure
+    char peekChar() const pure nothrow
     {
         if (readPosition >= input.length)
         {
@@ -168,7 +167,7 @@ struct Lexer
         }
     }
 
-    void skipWhiteSpace() pure
+    void skipWhiteSpace() pure nothrow 
     {
         while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')
         {
@@ -176,7 +175,6 @@ struct Lexer
         }
     }
 }
-
 
 bool isLetter(const char ch) pure nothrow @nogc
 {
@@ -210,7 +208,7 @@ if (5 < 10) {
 10 == 10;
 10 != 9;`;
 
-    Token[] tests = [
+    static immutable Token[] tests = [
         Token(TokenType.LET, "let"), Token(TokenType.IDENT, "five"),
         Token(TokenType.ASSIGN, "="), Token(TokenType.INT, "5"),
         Token(TokenType.SEMICOLON, ";"), Token(TokenType.LET, "let"),

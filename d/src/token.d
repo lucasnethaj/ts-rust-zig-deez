@@ -8,7 +8,6 @@ import std.algorithm;
 
 @safe:
 @nogc:
-nothrow:
 pure:
 
 struct Token
@@ -16,13 +15,13 @@ struct Token
     TokenType type;
     string literal;
 
-    this(TokenType type, string literal) pure
+    this(TokenType type, string literal) pure nothrow
     {
         this.type = type;
         this.literal = literal;
     }
 
-    this(TokenType type, char literal) pure
+    this(TokenType type, char literal) pure nothrow 
     {
         this.type = type;
         this.literal = [literal];
@@ -82,7 +81,7 @@ static immutable keywords = [
     tuple("return", TT.RETURN),
 ];
 
-const(TokenType) lookupIdent(const(string) ident) 
+const(TokenType) lookupIdent(const(string) ident) nothrow 
 {
     auto lookup = keywords.find!(keyword => keyword[0] == ident);
 
