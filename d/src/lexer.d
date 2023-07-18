@@ -3,86 +3,81 @@ module lexer;
 import std.format;
 import std.stdio : writeln;
 import std.ascii : isAlpha, isDigit;
-
+import std.meta;
 import token;
 
-bool isLetter(byte ch)
-{
-    return isAlpha(ch) || ch == '_';
-}
+@safe:
 
+@nogc
 struct Lexer
 {
     string input;
-    int position;
-    int readPosition;
-    byte ch;
+    size_t position;
+    size_t readPosition;
+    char ch;
+    Token current_token;
 
-    this(string input)
+    this(string input) nothrow pure
     {
         this.input = input;
         readChar;
+        popFront;
     }
 
-    Token nextToken()
+    
+    const(Token) nextToken() pure nothrow
     {
         Token tok;
         skipWhiteSpace;
 
-        switch (ch) 
-        with(TokenType)
+        TokenCase:
+        switch (ch) with (TokenType)
         {
+
+        static foreach(TOKEN_TYPE; AliasSeq!(
+                SEMICOLON,
+                LPAREN,
+                RPAREN,
+                COMMA,
+                PLUS,
+                LBRACE,
+                RBRACE,
+                LT,
+                GT,
+                ASTERISK,
+                MINUS,
+                SLASH, 
+            )
+        ) {
+            static assert(TOKEN_TYPE.length is 1, "This token can only be one char");
+
+            case TOKEN_TYPE[0]:
+                tok = Token(TOKEN_TYPE, TOKEN_TYPE[0]);
+                break TokenCase; 
+        }
+    
         case '=':
-            if (peekChar == '=') {
+            if (peekChar == '=')
+            {
                 const ch = this.ch;
                 readChar;
                 tok = Token(EQ, [ch, this.ch]);
-            } else {
+            }
+            else
+            {
                 tok = Token(ASSIGN, ch);
             }
             break;
-        case ';':
-            tok = Token(SEMICOLON, ch);
-            break;
-        case '(':
-            tok = Token(LPAREN, ch);
-            break;
-        case ')':
-            tok = Token(RPAREN, ch);
-            break;
-        case ',':
-            tok = Token(COMMA, ch);
-            break;
-        case '+':
-            tok = Token(PLUS, ch);
-            break;
-        case '{':
-            tok = Token(LBRACE, ch);
-            break;
-        case '}':
-            tok = Token(RBRACE, ch);
-            break;
-        case '<':
-            tok = Token(LT, ch);
-            break;
-        case '>':
-            tok = Token(GT, ch);
-            break;
-        case '*':
-            tok = Token(ASTERISK, ch);
-            break;
-        case '-':
-            tok = Token(MINUS, ch);
-            break;
-        case '/':
-            tok = Token(SLASH, ch);
-            break;
+
         case '!':
-            if (peekChar == '=') {
+            if (peekChar == '=')
+            {
                 const ch = this.ch;
                 readChar;
                 tok = Token(NOT_EQ, [ch, this.ch]);
-            } else {
+            }
+            else
+            {
                 tok = Token(BANG, ch);
             }
             break;
@@ -112,7 +107,21 @@ struct Lexer
         return tok;
     }
 
-    void readChar()
+
+    bool empty() const pure {
+        return readPosition > input.length;
+    }
+    void popFront() pure nothrow {
+        current_token = nextToken;
+    }
+
+    const(Token) front() const pure nothrow {
+        return current_token;
+    }
+
+
+    
+    void readChar() pure nothrow
     {
         if (readPosition >= input.length)
         {
@@ -126,7 +135,7 @@ struct Lexer
         readPosition += 1;
     }
 
-    string readNumber()
+    string readNumber() pure nothrow
     {
         const beginPos = position;
         while (isDigit(ch))
@@ -136,7 +145,7 @@ struct Lexer
         return input[beginPos .. position];
     }
 
-    string readIdentifier()
+    string readIdentifier() pure nothrow
     {
         const beginPos = position;
         while (isLetter(ch))
@@ -146,15 +155,19 @@ struct Lexer
         return input[beginPos .. position];
     }
 
-    byte peekChar() {
-        if (readPosition >= input.length) {
+    char peekChar() const pure nothrow
+    {
+        if (readPosition >= input.length)
+        {
             return 0;
-        } else {
+        }
+        else
+        {
             return input[readPosition];
         }
     }
 
-    void skipWhiteSpace()
+    void skipWhiteSpace() pure nothrow 
     {
         while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')
         {
@@ -162,6 +175,13 @@ struct Lexer
         }
     }
 }
+
+bool isLetter(const char ch) pure nothrow @nogc
+{
+    return isAlpha(ch) || ch == '_';
+}
+
+
 
 
 /// Monkey code test
@@ -188,96 +208,59 @@ if (5 < 10) {
 10 == 10;
 10 != 9;`;
 
-    Token[] tests = [
-		Token(TokenType.LET, "let"),
-		Token(TokenType.IDENT, "five"),
-		Token(TokenType.ASSIGN, "="),
-		Token(TokenType.INT, "5"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.LET, "let"),
-		Token(TokenType.IDENT, "ten"),
-		Token(TokenType.ASSIGN, "="),
-		Token(TokenType.INT, "10"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.LET, "let"),
-		Token(TokenType.IDENT, "add"),
-		Token(TokenType.ASSIGN, "="),
-		Token(TokenType.FUNCTION, "fn"),
-		Token(TokenType.LPAREN, "("),
-		Token(TokenType.IDENT, "x"),
-		Token(TokenType.COMMA, ","),
-		Token(TokenType.IDENT, "y"),
-		Token(TokenType.RPAREN, ")"),
-		Token(TokenType.LBRACE, "{"),
-		Token(TokenType.IDENT, "x"),
-		Token(TokenType.PLUS, "+"),
-		Token(TokenType.IDENT, "y"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.RBRACE, "}"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.LET, "let"),
-		Token(TokenType.IDENT, "result"),
-		Token(TokenType.ASSIGN, "="),
-		Token(TokenType.IDENT, "add"),
-		Token(TokenType.LPAREN, "("),
-		Token(TokenType.IDENT, "five"),
-		Token(TokenType.COMMA, ","),
-		Token(TokenType.IDENT, "ten"),
-		Token(TokenType.RPAREN, ")"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.BANG, "!"),
-		Token(TokenType.MINUS, "-"),
-		Token(TokenType.SLASH, "/"),
-		Token(TokenType.ASTERISK, "*"),
-		Token(TokenType.INT, "5"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.INT, "5"),
-		Token(TokenType.LT, "<"),
-		Token(TokenType.INT, "10"),
-		Token(TokenType.GT, ">"),
-		Token(TokenType.INT, "5"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.IF, "if"),
-		Token(TokenType.LPAREN, "("),
-		Token(TokenType.INT, "5"),
-		Token(TokenType.LT, "<"),
-		Token(TokenType.INT, "10"),
-		Token(TokenType.RPAREN, ")"),
-		Token(TokenType.LBRACE, "{"),
-		Token(TokenType.RETURN, "return"),
-		Token(TokenType.TRUE, "true"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.RBRACE, "}"),
-		Token(TokenType.ELSE, "else"),
-		Token(TokenType.LBRACE, "{"),
-		Token(TokenType.RETURN, "return"),
-		Token(TokenType.FALSE, "false"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.RBRACE, "}"),
-		Token(TokenType.INT, "10"),
-		Token(TokenType.EQ, "=="),
-		Token(TokenType.INT, "10"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.INT, "10"),
-		Token(TokenType.NOT_EQ, "!="),
-		Token(TokenType.INT, "9"),
-		Token(TokenType.SEMICOLON, ";"),
-		Token(TokenType.EOF, ""),
+    static immutable Token[] tests = [
+        Token(TokenType.LET, "let"), Token(TokenType.IDENT, "five"),
+        Token(TokenType.ASSIGN, "="), Token(TokenType.INT, "5"),
+        Token(TokenType.SEMICOLON, ";"), Token(TokenType.LET, "let"),
+        Token(TokenType.IDENT, "ten"), Token(TokenType.ASSIGN, "="),
+        Token(TokenType.INT, "10"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.LET, "let"), Token(TokenType.IDENT, "add"),
+        Token(TokenType.ASSIGN, "="), Token(TokenType.FUNCTION, "fn"),
+        Token(TokenType.LPAREN, "("), Token(TokenType.IDENT, "x"),
+        Token(TokenType.COMMA, ","), Token(TokenType.IDENT, "y"),
+        Token(TokenType.RPAREN, ")"), Token(TokenType.LBRACE, "{"),
+        Token(TokenType.IDENT, "x"), Token(TokenType.PLUS, "+"),
+        Token(TokenType.IDENT, "y"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.RBRACE, "}"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.LET, "let"), Token(TokenType.IDENT, "result"),
+        Token(TokenType.ASSIGN, "="), Token(TokenType.IDENT, "add"),
+        Token(TokenType.LPAREN, "("), Token(TokenType.IDENT, "five"),
+        Token(TokenType.COMMA, ","), Token(TokenType.IDENT, "ten"),
+        Token(TokenType.RPAREN, ")"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.BANG, "!"), Token(TokenType.MINUS, "-"),
+        Token(TokenType.SLASH, "/"), Token(TokenType.ASTERISK, "*"),
+        Token(TokenType.INT, "5"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.INT, "5"), Token(TokenType.LT, "<"),
+        Token(TokenType.INT, "10"), Token(TokenType.GT, ">"),
+        Token(TokenType.INT, "5"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.IF, "if"), Token(TokenType.LPAREN, "("),
+        Token(TokenType.INT, "5"), Token(TokenType.LT, "<"),
+        Token(TokenType.INT, "10"), Token(TokenType.RPAREN, ")"),
+        Token(TokenType.LBRACE, "{"), Token(TokenType.RETURN, "return"),
+        Token(TokenType.TRUE, "true"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.RBRACE, "}"), Token(TokenType.ELSE, "else"),
+        Token(TokenType.LBRACE, "{"), Token(TokenType.RETURN, "return"),
+        Token(TokenType.FALSE, "false"), Token(TokenType.SEMICOLON, ";"),
+        Token(TokenType.RBRACE, "}"), Token(TokenType.INT, "10"),
+        Token(TokenType.EQ, "=="), Token(TokenType.INT, "10"),
+        Token(TokenType.SEMICOLON, ";"), Token(TokenType.INT, "10"),
+        Token(TokenType.NOT_EQ, "!="), Token(TokenType.INT, "9"),
+        Token(TokenType.SEMICOLON, ";"), Token(TokenType.EOF, ""),
     ];
 
     Lexer l = Lexer(input);
 
     foreach (t; tests)
     {
-        const tok = l.nextToken();
+        const tok = l.front();
         debug writeln(format("%s : %s", tok, t));
 
-        assert(tok.type == t.type,
-            format("Wrong token type '%s' expected '%s'", tok.type, t.type)
-        );
+        assert(tok.type == t.type, format("Wrong token type '%s' expected '%s'", tok.type, t.type));
         assert(tok.literal == t.literal,
-            format("Wrong literal '%s' expected '%s'", tok.literal, t.literal)
-        );
+                format("Wrong literal '%s' expected '%s'", tok.literal, t.literal));
+        l.popFront;
     }
 
 }
+
+

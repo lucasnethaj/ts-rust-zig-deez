@@ -6,22 +6,36 @@ import lexer;
 
 enum PROMPT = ">> ";
 
-void start(File inFile, File outFile) {
-    while (true) {
-        outFile.write(PROMPT);
-        string line = inFile.readln();
-        if (line == null) {
+@safe:
+
+void start(File inFile, File outFile)
+{
+    outFile.write(PROMPT);
+
+    char[1024] buf;
+    string text;
+
+    for (;;) {
+        const read_buffer = inFile.rawRead(buf);
+        if (read_buffer.length is 0) {
             break;
         }
-
-        Lexer lexer = Lexer(line);
-        Token tok;
-
-        while (tok.type != TokenType.EOF) {
-            tok = lexer.nextToken();
-            outFile.writeln(tok);
-        }
-
+        text ~= read_buffer;
     }
+
+    Lexer lexer = Lexer(text);
+    Token tok;
+
+
+    // while (tok.type != TokenType.EOF)
+    // {
+    //     tok = lexer.nextToken();
+    //     outFile.writeln(tok);
+    // }
+
+    auto _lexer = Lexer(text);
+    foreach(_tok; _lexer) {
+        outFile.writeln(_tok);
+    }
+
 }
-    
